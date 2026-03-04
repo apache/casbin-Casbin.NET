@@ -17,7 +17,7 @@ namespace Casbin.UnitTests.Mock
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception,
             Func<TState, Exception, string> formatter)
         {
-            string outPut = formatter(state, null);
+            string outPut = formatter(state, exception);
             _testOutputHelper.WriteLine(outPut);
             Logs.Add((logLevel, exception, outPut));
         }
