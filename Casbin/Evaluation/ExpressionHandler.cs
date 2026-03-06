@@ -72,7 +72,6 @@ internal class ExpressionHandler : IExpressionHandler
         where TRequest : IRequestValues
         where TPolicy : IPolicyValues
     {
-        expressionString = expressionString.Replace('\'', '"');
         if (context.View.SupportGeneric is false)
         {
             if (_cachePool.TryGetFunc(expressionString,
