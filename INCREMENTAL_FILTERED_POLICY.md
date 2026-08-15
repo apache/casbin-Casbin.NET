@@ -118,5 +118,5 @@ new PolicyFilter(PermConstants.DefaultPolicyType, 1, Policy.ValuesFrom(new[] { "
 
 ## Related Documentation
 
-- [Casbin Policy Subset Loading](https://casbin.org/docs/policy-subset-loading/)
-- [Casbin Adapters](https://casbin.org/docs/adapters)
+- [Casbin Policy Subset Loading](https://casbin.apache.org/docs/policy-subset-loading/)
+- [Casbin Adapters](https://casbin.apache.org/docs/adapters)

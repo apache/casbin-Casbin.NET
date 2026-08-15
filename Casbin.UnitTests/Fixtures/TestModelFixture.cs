@@ -61,48 +61,48 @@ public class TestModelFixture
     public static readonly string KeyMatchModelText = ReadTestFile("keymatch_model.conf");
     public static readonly string KeyMatchPolicyText = ReadTestFile("keymatch_policy.csv");
 
-    //https://github.com/casbin/Casbin.NET/issues/310
+    //https://github.com/apache/casbin-Casbin.NET/issues/310
     public static readonly string CommaAndQuotationsModelText = ReadTestFile("comma_quotations_model.conf");
     public static readonly string CommaAndQuotationsPolicyText = ReadTestFile("comma_quotations_policy.csv");
 
-    // https://github.com/casbin/Casbin.NET/issues/134
+    // https://github.com/apache/casbin-Casbin.NET/issues/134
     public static readonly string MultipleTypeModelText = ReadTestFile("multiple_type_model.conf");
     public static readonly string MultipleTypePolicyText = ReadTestFile("multiple_type_policy.csv");
 
-    // https://github.com/casbin/Casbin.NET/issues/106
+    // https://github.com/apache/casbin-Casbin.NET/issues/106
     public static readonly string RbacMultipleEvalModelText = ReadTestFile("rbac_multiple_eval_model.conf");
     public static readonly string RbacMultipleEvalPolicyText = ReadTestFile("rbac_multiple_eval_policy.csv");
 
-    // https://github.com/casbin/Casbin.NET/issues/154
+    // https://github.com/apache/casbin-Casbin.NET/issues/154
     public static readonly string RbacMultipleModelText = ReadTestFile("rbac_multiple_rolemanager_model.conf");
     public static readonly string RbacMultiplePolicyText = ReadTestFile("rbac_multiple_rolemanager_policy.csv");
 
-    // https://github.com/casbin/Casbin.NET/issues/188
+    // https://github.com/apache/casbin-Casbin.NET/issues/188
     public static readonly string PriorityExplicitDenyOverrideModelText = ReadTestFile("priority_explicit_deny_override_model.conf");
     public static readonly string PriorityExplicitDenyOverridePolicyText = ReadTestFile("priority_explicit_deny_override_policy.csv");
 
-    // https://github.com/casbin/Casbin.NET/issues/229
+    // https://github.com/apache/casbin-Casbin.NET/issues/229
     public static readonly string SupportCountModelText = ReadTestFile("support_count_model.conf");
 
-    // https://github.com/casbin/Casbin.NET/issues/308
+    // https://github.com/apache/casbin-Casbin.NET/issues/308
     public static readonly string RbacTokensWithSubstringRelationModelText = ReadTestFile("tokens_with_substring_relation_rbac.conf");
     public static readonly string RbacTokensWithSubstringRelationPolicyText = ReadTestFile("tokens_with_substring_relation_rbac.csv");
     public static readonly string AbacTokensWithSubstringRelationModelText = ReadTestFile("tokens_with_substring_relation_abac.conf");
     public static readonly string AbacTokensWithSubstringRelationPolicyText = ReadTestFile("tokens_with_substring_relation_abac.csv");
 
-    // https://github.com/casbin/Casbin.NET/issues/321
+    // https://github.com/apache/casbin-Casbin.NET/issues/321
     public static readonly string BackslashLineFeedModelText = ReadTestFile("backslash_feed_model.conf");
     public static readonly string BackslashLineFeedPolicyText = ReadTestFile("backslash_feed_policy.csv");
 
-    // https://github.com/casbin/Casbin.NET/issues/353
+    // https://github.com/apache/casbin-Casbin.NET/issues/353
     public static readonly string RbacWithIndexMatcherModelText = ReadTestFile("rbac_with_index_matcher_model.conf");
     public static readonly string RbacWithIndexMatcherPolicyText = ReadTestFile("rbac_with_index_matcher_policy.csv");
 
-    // https://github.com/casbin/Casbin.NET/issues/354
+    // https://github.com/apache/casbin-Casbin.NET/issues/354
     public static readonly string AbacWithDynamicValueTypeModelText = ReadTestFile("abac_with_dynamic_value_type_model.conf");
     public static readonly string AbacWithDynamicValueTypePolicyText = ReadTestFile("abac_with_dynamic_value_type_policy.csv");
 
-    // https://github.com/casbin/Casbin.NET/issues/364
+    // https://github.com/apache/casbin-Casbin.NET/issues/364
     public static readonly string AbacNotUsingPolicyModelText = ReadTestFile("abac_not_using_policy_model.conf");
     public static readonly string AbacRuleEffectPolicyText = ReadTestFile("abac_rule_effect_policy.csv");
     public static readonly string AbacRuleModelText = ReadTestFile("abac_rule_model.conf");

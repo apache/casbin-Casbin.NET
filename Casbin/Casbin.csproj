@@ -17,8 +17,8 @@
     <RepositoryType>GIT</RepositoryType>
     <Copyright>Apache License 2.0</Copyright>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <RepositoryUrl>https://github.com/casbin/Casbin.NET</RepositoryUrl>
-    <PackageProjectUrl>https://github.com/casbin/Casbin.NET</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/apache/casbin-Casbin.NET</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/apache/casbin-Casbin.NET</PackageProjectUrl>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>

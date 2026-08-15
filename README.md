@@ -7,20 +7,20 @@
 [![Nuget](https://img.shields.io/nuget/dt/Casbin.NET.svg)](https://www.nuget.org/packages/Casbin.NET/)
 [![Discord](https://img.shields.io/discord/1022748306096537660?logo=discord&label=discord&color=5865F2)](https://discord.gg/S5UjpzGZjN)
 
-**News**: still worry about how to write the correct Casbin policy? `Casbin online editor` is coming to help! Try it at: http://casbin.org/editor/
+**News**: still worry about how to write the correct Casbin policy? `Casbin online editor` is coming to help! Try it at: https://casbin.apache.org/editor/
 
 Casbin.NET is a powerful and efficient open-source access control library for [.NET (C#)](https://dotnet.microsoft.com/) projects. It provides support for enforcing authorization based on various [access control models](https://en.wikipedia.org/wiki/Computer_security_model).
 
 ## All the languages supported by Casbin:
 
-| [![golang](https://github.com/casbin/casbin.io/blob/master/img/langs/golang.png?raw=true)](https://github.com/casbin/casbin) | [![java](https://github.com/casbin/casbin.io/blob/master/img/langs/java.png?raw=true)](https://github.com/casbin/jcasbin) | [![nodejs](https://github.com/casbin/casbin.io/blob/master/img/langs/nodejs.png?raw=true)](https://github.com/casbin/node-casbin) | [![php](https://github.com/casbin/casbin.io/blob/master/img/langs/php.png?raw=true)](https://github.com/php-casbin/php-casbin) |
+| [![golang](https://github.com/apache/casbin-casbin.io/blob/master/img/langs/golang.png?raw=true)](https://github.com/apache/casbin) | [![java](https://github.com/apache/casbin-casbin.io/blob/master/img/langs/java.png?raw=true)](https://github.com/apache/casbin-jcasbin) | [![nodejs](https://github.com/apache/casbin-casbin.io/blob/master/img/langs/nodejs.png?raw=true)](https://github.com/apache/casbin-node-casbin) | [![php](https://github.com/apache/casbin-casbin.io/blob/master/img/langs/php.png?raw=true)](https://github.com/php-casbin/php-casbin) |
 | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| [Casbin](https://github.com/casbin/casbin)                   | [jCasbin](https://github.com/casbin/jcasbin)                 | [node-Casbin](https://github.com/casbin/node-casbin)         | [PHP-Casbin](https://github.com/php-casbin/php-casbin)       |
+| [Casbin](https://github.com/apache/casbin)                   | [jCasbin](https://github.com/apache/casbin-jcasbin)                 | [node-Casbin](https://github.com/apache/casbin-node-casbin)         | [PHP-Casbin](https://github.com/php-casbin/php-casbin)       |
 | production-ready                                             | production-ready                                             | production-ready                                             | production-ready                                             |
 
-| [![python](https://github.com/casbin/casbin.io/blob/master/img/langs/python.png?raw=true)](https://github.com/casbin/pycasbin) | [![dotnet](https://github.com/casbin/casbin.io/blob/master/img/langs/dotnet.png?raw=true)](https://github.com/apache/casbin-Casbin.NET) | [![delphi](https://github.com/casbin/casbin.io/blob/master/img/langs/delphi.png?raw=true)](https://github.com/casbin4d/Casbin4D) | [![rust](https://github.com/casbin/casbin.io/blob/master/img/langs/rust.png?raw=true)](https://github.com/casbin/casbin-rs) |
+| [![python](https://github.com/apache/casbin-casbin.io/blob/master/img/langs/python.png?raw=true)](https://github.com/apache/casbin-pycasbin) | [![dotnet](https://github.com/apache/casbin-casbin.io/blob/master/img/langs/dotnet.png?raw=true)](https://github.com/apache/casbin-Casbin.NET) | [![delphi](https://github.com/apache/casbin-casbin.io/blob/master/img/langs/delphi.png?raw=true)](https://github.com/casbin4d/Casbin4D) | [![rust](https://github.com/apache/casbin-casbin.io/blob/master/img/langs/rust.png?raw=true)](https://github.com/apache/casbin-rs) |
 | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| [PyCasbin](https://github.com/casbin/pycasbin)               | [Casbin.NET](https://github.com/apache/casbin-Casbin.NET)           | [Casbin4D](https://github.com/casbin4d/Casbin4D)             | [Casbin-RS](https://github.com/casbin/casbin-rs)             |
+| [PyCasbin](https://github.com/apache/casbin-pycasbin)               | [Casbin.NET](https://github.com/apache/casbin-Casbin.NET)           | [Casbin4D](https://github.com/casbin4d/Casbin4D)             | [Casbin-RS](https://github.com/apache/casbin-rs)             |
 | production-ready                                             | production-ready                                             | experimental                                                 | production-ready                                             |
 
 ## Table of contents
@@ -137,15 +137,15 @@ dotnet add package Casbin.NET
 
 ## Documentation
 
-https://casbin.org/docs/overview
+https://casbin.apache.org/docs/overview
 
 ## Online editor
 
-You can also use the online editor (http://casbin.org/editor/) to write your Casbin model and policy in your web browser. It provides functionality such as `syntax highlighting` and `code completion`, just like an IDE for a programming language.
+You can also use the online editor (https://casbin.apache.org/editor/) to write your Casbin model and policy in your web browser. It provides functionality such as `syntax highlighting` and `code completion`, just like an IDE for a programming language.
 
 ## Tutorials
 
-https://casbin.org/docs/tutorials
+https://casbin.apache.org/docs/tutorials
 
 ## Get started
 
@@ -185,8 +185,8 @@ See [Policy management APIs](#policy-management) for more usage.
 
 Casbin provides two sets of APIs to manage permissions:
 
-- [Management API](https://github.com/casbin/casbin/blob/master/management_api.go): the primitive API that provides full support for Casbin policy management. See [here](https://github.com/casbin/casbin/blob/master/management_api_test.go) for examples.
-- [RBAC API](https://github.com/casbin/casbin/blob/master/rbac_api.go): a more friendly API for RBAC. This API is a subset of Management API. The RBAC users could use this API to simplify the code. See [here](https://github.com/casbin/casbin/blob/master/rbac_api_test.go) for examples.
+- [Management API](https://github.com/apache/casbin/blob/master/management_api.go): the primitive API that provides full support for Casbin policy management. See [here](https://github.com/apache/casbin/blob/master/management_api_test.go) for examples.
+- [RBAC API](https://github.com/apache/casbin/blob/master/rbac_api.go): a more friendly API for RBAC. This API is a subset of Management API. The RBAC users could use this API to simplify the code. See [here](https://github.com/apache/casbin/blob/master/rbac_api_test.go) for examples.
 
 We also provide a web-based UI for model management and policy management:
 
@@ -196,43 +196,43 @@ We also provide a web-based UI for model management and policy management:
 
 ## Policy persistence
 
-https://casbin.org/docs/adapters
+https://casbin.apache.org/docs/adapters
 
 ## Policy consistence between multiple nodes
 
-https://casbin.org/docs/watchers
+https://casbin.apache.org/docs/watchers
 
 ## Role manager
 
-https://casbin.org/docs/role-managers
+https://casbin.apache.org/docs/role-managers
 
 ## Benchmarks
 
-https://casbin.org/docs/benchmark
+https://casbin.apache.org/docs/benchmark
 
 ## Examples
 
 | Model                     | Model file                                                                                                                       | Policy file                                                                                                                      |
 | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| ACL                       | [basic_model.conf](https://github.com/casbin/casbin/blob/master/examples/basic_model.conf)                                       | [basic_policy.csv](https://github.com/casbin/casbin/blob/master/examples/basic_policy.csv)                                       |
-| ACL with superuser        | [basic_model_with_root.conf](https://github.com/casbin/casbin/blob/master/examples/basic_with_root_model.conf)                   | [basic_policy.csv](https://github.com/casbin/casbin/blob/master/examples/basic_policy.csv)                                       |
-| ACL without users         | [basic_model_without_users.conf](https://github.com/casbin/casbin/blob/master/examples/basic_without_users_model.conf)           | [basic_policy_without_users.csv](https://github.com/casbin/casbin/blob/master/examples/basic_without_users_policy.csv)           |
-| ACL without resources     | [basic_model_without_resources.conf](https://github.com/casbin/casbin/blob/master/examples/basic_without_resources_model.conf)   | [basic_policy_without_resources.csv](https://github.com/casbin/casbin/blob/master/examples/basic_without_resources_policy.csv)   |
-| RBAC                      | [rbac_model.conf](https://github.com/casbin/casbin/blob/master/examples/rbac_model.conf)                                         | [rbac_policy.csv](https://github.com/casbin/casbin/blob/master/examples/rbac_policy.csv)                                         |
-| RBAC with resource roles  | [rbac_model_with_resource_roles.conf](https://github.com/casbin/casbin/blob/master/examples/rbac_with_resource_roles_model.conf) | [rbac_policy_with_resource_roles.csv](https://github.com/casbin/casbin/blob/master/examples/rbac_with_resource_roles_policy.csv) |
-| RBAC with domains/tenants | [rbac_model_with_domains.conf](https://github.com/casbin/casbin/blob/master/examples/rbac_with_domains_model.conf)               | [rbac_policy_with_domains.csv](https://github.com/casbin/casbin/blob/master/examples/rbac_with_domains_policy.csv)               |
-| ABAC                      | [abac_model.conf](https://github.com/casbin/casbin/blob/master/examples/abac_model.conf)                                         | N/A                                                                                                                              |
-| RESTful                   | [keymatch_model.conf](https://github.com/casbin/casbin/blob/master/examples/keymatch_model.conf)                                 | [keymatch_policy.csv](https://github.com/casbin/casbin/blob/master/examples/keymatch_policy.csv)                                 |
-| Deny-override             | [rbac_model_with_deny.conf](https://github.com/casbin/casbin/blob/master/examples/rbac_with_deny_model.conf)                     | [rbac_policy_with_deny.csv](https://github.com/casbin/casbin/blob/master/examples/rbac_with_deny_policy.csv)                     |
-| Priority                  | [priority_model.conf](https://github.com/casbin/casbin/blob/master/examples/priority_model.conf)                                 | [priority_policy.csv](https://github.com/casbin/casbin/blob/master/examples/priority_policy.csv)                                 |
+| ACL                       | [basic_model.conf](https://github.com/apache/casbin/blob/master/examples/basic_model.conf)                                       | [basic_policy.csv](https://github.com/apache/casbin/blob/master/examples/basic_policy.csv)                                       |
+| ACL with superuser        | [basic_model_with_root.conf](https://github.com/apache/casbin/blob/master/examples/basic_with_root_model.conf)                   | [basic_policy.csv](https://github.com/apache/casbin/blob/master/examples/basic_policy.csv)                                       |
+| ACL without users         | [basic_model_without_users.conf](https://github.com/apache/casbin/blob/master/examples/basic_without_users_model.conf)           | [basic_policy_without_users.csv](https://github.com/apache/casbin/blob/master/examples/basic_without_users_policy.csv)           |
+| ACL without resources     | [basic_model_without_resources.conf](https://github.com/apache/casbin/blob/master/examples/basic_without_resources_model.conf)   | [basic_policy_without_resources.csv](https://github.com/apache/casbin/blob/master/examples/basic_without_resources_policy.csv)   |
+| RBAC                      | [rbac_model.conf](https://github.com/apache/casbin/blob/master/examples/rbac_model.conf)                                         | [rbac_policy.csv](https://github.com/apache/casbin/blob/master/examples/rbac_policy.csv)                                         |
+| RBAC with resource roles  | [rbac_model_with_resource_roles.conf](https://github.com/apache/casbin/blob/master/examples/rbac_with_resource_roles_model.conf) | [rbac_policy_with_resource_roles.csv](https://github.com/apache/casbin/blob/master/examples/rbac_with_resource_roles_policy.csv) |
+| RBAC with domains/tenants | [rbac_model_with_domains.conf](https://github.com/apache/casbin/blob/master/examples/rbac_with_domains_model.conf)               | [rbac_policy_with_domains.csv](https://github.com/apache/casbin/blob/master/examples/rbac_with_domains_policy.csv)               |
+| ABAC                      | [abac_model.conf](https://github.com/apache/casbin/blob/master/examples/abac_model.conf)                                         | N/A                                                                                                                              |
+| RESTful                   | [keymatch_model.conf](https://github.com/apache/casbin/blob/master/examples/keymatch_model.conf)                                 | [keymatch_policy.csv](https://github.com/apache/casbin/blob/master/examples/keymatch_policy.csv)                                 |
+| Deny-override             | [rbac_model_with_deny.conf](https://github.com/apache/casbin/blob/master/examples/rbac_with_deny_model.conf)                     | [rbac_policy_with_deny.csv](https://github.com/apache/casbin/blob/master/examples/rbac_with_deny_policy.csv)                     |
+| Priority                  | [priority_model.conf](https://github.com/apache/casbin/blob/master/examples/priority_model.conf)                                 | [priority_policy.csv](https://github.com/apache/casbin/blob/master/examples/priority_policy.csv)                                 |
 
 ## Middlewares
 
-Authz middlewares for web frameworks: https://casbin.org/docs/middlewares
+Authz middlewares for web frameworks: https://casbin.apache.org/docs/middlewares
 
 ## Our adopters
 
-https://casbin.org/docs/adopters
+https://casbin.apache.org/docs/adopters
 
 ## Contributors
 
