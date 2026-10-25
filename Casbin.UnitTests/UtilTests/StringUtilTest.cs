@@ -61,6 +61,24 @@ public class StringUtilTest
         ]
     ];
 
+    public static IEnumerable<object[]> ReplaceInListOperatorTestData =
+    [
+        ["r.obj in (\"a\", \"b\")", "(r.obj == \"a\" || r.obj == \"b\")"],
+        ["r.obj in [\"a\", \"b\"]", "(r.obj == \"a\" || r.obj == \"b\")"],
+        ["r.obj in (\"a\")", "(r.obj == \"a\")"],
+        ["r.obj in (\"a,b\", \"c\")", "(r.obj == \"a,b\" || r.obj == \"c\")"],
+        ["r.obj in (\"a, \\\"b,c\\\"\", \"d\")", "(r.obj == \"a, \\\"b,c\\\"\" || r.obj == \"d\")"],
+        ["r.obj in (\"a\\\\\", \"b\")", "(r.obj == \"a\\\\\" || r.obj == \"b\")"],
+        ["r.obj in (\"f(x)\", \"[y]\")", "(r.obj == \"f(x)\" || r.obj == \"[y]\")"],
+        ["r.obj in [\"f(x)\", \"[y]\"]", "(r.obj == \"f(x)\" || r.obj == \"[y]\")"],
+        ["r.obj in (p.obj)", "r.obj in (p.obj)"]
+    ];
+
+    [Theory]
+    [MemberData(nameof(ReplaceInListOperatorTestData))]
+    public void TestReplaceInListOperator(string expressionString, string expected) =>
+        Assert.Equal(expected, StringUtil.ReplaceInListOperator(expressionString));
+
     [Theory]
     [MemberData(nameof(RemoveCommentsTestData))]
     public void TestRemoveComments(string except, string actual) => Assert.Equal(except, actual.RemoveComments());

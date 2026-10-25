@@ -9,7 +9,7 @@ namespace Casbin.Util
     {
         private static readonly Regex s_evalRegex = new(@"\beval\((?<rule>[^)]*)\)");
         private static readonly Regex s_inOperatorRegex = new(@"([a-zA-Z0-9_.()""]+) in ([a-zA-Z0-9_.()""]+)");
-        private static readonly Regex s_inListOperatorRegex = new(@"([a-zA-Z0-9_.]+)\s+in\s+(?:\(([^()]*)\)|\[([^\[\]]*)\])");
+        private static readonly Regex s_inListOperatorRegex = new(@"([a-zA-Z0-9_.]+)\s+in\s+(?:\(((?:""(?:[^""\\]|\\.)*""|[^()""])*)\)|\[((?:""(?:[^""\\]|\\.)*""|[^\[\]""])*)\])");
 
         /// <summary>
         /// Removes the comments starting with # in the text.
@@ -138,28 +138,34 @@ namespace Casbin.Util
             List<string> values = new();
             int start = 0;
             bool inQuotes = false;
-            for (int i = 0; i <= list.Length; i++)
+            for (int i = 0; i < list.Length; i++)
             {
-                if (i < list.Length && list[i] is '"')
+                switch (list[i])
                 {
-                    inQuotes = !inQuotes;
+                    case '\\' when inQuotes:
+                        i++;
+                        break;
+                    case '"':
+                        inQuotes = !inQuotes;
+                        break;
+                    case ',' when inQuotes is false:
+                        AddValue(list.Substring(start, i - start));
+                        start = i + 1;
+                        break;
                 }
+            }
 
-                if (i < list.Length && (inQuotes || list[i] is not ','))
-                {
-                    continue;
-                }
+            AddValue(list.Substring(start));
+            return values;
 
-                string value = list.Substring(start, i - start).Trim();
+            void AddValue(string value)
+            {
+                value = value.Trim();
                 if (value.Length is not 0)
                 {
                     values.Add(value);
                 }
-
-                start = i + 1;
             }
-
-            return values;
         }
     }
 }

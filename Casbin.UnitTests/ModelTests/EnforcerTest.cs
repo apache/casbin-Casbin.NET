@@ -1291,6 +1291,32 @@ public class EnforcerTest
 
     #endregion
 
+    [Fact]
+    public void TestInOperatorWithLiteralList()
+    {
+        string text =
+            "[request_definition]\n"
+            + "r = sub, obj, act\n"
+            + "\n"
+            + "[policy_definition]\n"
+            + "p = sub, obj, act\n"
+            + "\n"
+            + "[policy_effect]\n"
+            + "e = some(where (p.eft == allow))\n"
+            + "\n"
+            + "[matchers]\n"
+            + "m = r.sub == p.sub && r.obj in (\"a, \\\"b,c\\\"\", \"f(x)\") && r.act in ['read', 'write']\n";
+
+        Enforcer e = new(DefaultModel.CreateFromText(text));
+        e.AddPolicy("alice", "any", "any");
+
+        Assert.True(e.Enforce("alice", "a, \"b,c\"", "read"));
+        Assert.True(e.Enforce("alice", "f(x)", "write"));
+        Assert.False(e.Enforce("alice", "a", "read"));
+        Assert.False(e.Enforce("alice", "f(x)", "delete"));
+        Assert.False(e.Enforce("bob", "f(x)", "read"));
+    }
+
 #if !NET452
     #region ExpressionHandler Tests
 
