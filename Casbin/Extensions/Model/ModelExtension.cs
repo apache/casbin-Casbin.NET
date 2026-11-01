@@ -12,9 +12,13 @@ namespace Casbin.Model
     {
         public static bool SortPolicy(this IModel model)
         {
-            string value = model.Sections.GetValue(PermConstants.Section.PolicyEffectSection,
-                PermConstants.DefaultPolicyEffectType);
-            switch (value)
+            if (model.Sections.TryGetAssertion(PermConstants.Section.PolicyEffectSection,
+                    PermConstants.DefaultPolicyEffectType, out PolicyEffectAssertion assertion) is false)
+            {
+                return false;
+            }
+
+            switch (assertion.Value)
             {
                 case PermConstants.PolicyEffect.Priority:
                 case PermConstants.PolicyEffect.PriorityDenyOverride:

@@ -604,6 +604,35 @@ public partial class ModelTest
     }
 
     [Fact]
+    public void TestOnlyNonDefaultTypeModel()
+    {
+        IModel model = DefaultModel.Create();
+        model.AddDef("r", "r2", "sub, obj, act");
+        model.AddDef("p", "p2", "sub, obj, act");
+        model.AddDef("g", "g", "_, _");
+        model.AddDef("e", "e2", "some(where (p.eft == allow))");
+        model.AddDef("m", "m2", "g(r2.sub, p2.sub) && r2.obj == p2.obj && r2.act == p2.act");
+
+        Enforcer e = new(model);
+        e.AddNamedPolicy(PermConstants.PolicyType2, "alice", "data1", "read");
+        e.AddNamedPolicy(PermConstants.PolicyType2, "bob", "data2", "write");
+        e.BuildRoleLinks();
+
+        EnforceContext context = e.CreateContext
+        (
+            PermConstants.RequestType2,
+            PermConstants.PolicyType2,
+            PermConstants.PolicyEffectType2,
+            PermConstants.MatcherType2
+        );
+
+        Assert.True(e.Enforce(context, "alice", "data1", "read"));
+        Assert.False(e.Enforce(context, "alice", "data1", "write"));
+        Assert.True(e.Enforce(context, "bob", "data2", "write"));
+        Assert.False(e.Enforce(context, "bob", "data2", "read"));
+    }
+
+    [Fact]
     public void TestAbacComment()
     {
         var model = TestModelFixture.GetNewTestModel(TestModelFixture.AbacCommentText);
