@@ -1,4 +1,10 @@
-# Casbin.NET
+# Apache Casbin.NET (Incubating)
+
+Apache Casbin (Incubating) is an effort undergoing incubation at the Apache Software Foundation (ASF), sponsored by the Apache Incubator PMC.
+
+Incubation is required of all newly accepted projects until a further review indicates that the infrastructure, communications, and decision making process have stabilized in a manner consistent with other successful ASF projects.
+
+While incubation status is not necessarily a reflection of the completeness or stability of the code, it does indicate that the project has yet to be fully endorsed by the ASF.
 
 [![Build Status](https://dev.azure.com/Casbin/Casbin.NET/_apis/build/status/casbin.Casbin.NET?branchName=master)](https://dev.azure.com/Casbin/Casbin.NET/_build?definitionId=1)
 [![Coverage Status](https://coveralls.io/repos/github/apache/casbin-Casbin.NET/badge.svg?branch=master)](https://coveralls.io/github/apache/casbin-Casbin.NET?branch=master)
