@@ -32,7 +32,7 @@ release approval.
    namespaces and assembly compatibility separate from NuGet naming.
 3. Build and test all supported target frameworks. Enable the pinned upstream
    conformance corpus with `CASBIN_CONFORMANCE_DIR`; the test returns early when
-   that variable is absent. Inspect a real `.nupkg` and `.snupkg`, including all
+   that variable is absent. Inspect the real `.nupkg`, including its portable PDBs, embedded source and all
    target frameworks and their legal/source contents.
 4. Push `vVERSION-rcN` only after release-manager authorization. The candidate
    workflow checks the committed version, builds/tests and creates an unsigned
@@ -71,7 +71,7 @@ and explicit publication authorization:
    An existing version is a stop-and-reconcile condition. Do not overwrite it,
    regenerate a different package under it or mask a conflict with
    `--skip-duplicate`. If a retry finds a prior upload, establish equality with
-   the recorded original before continuing. Handle symbols separately.
+   the recorded original before continuing. Portable PDBs with embedded source are included in the main package alongside its legal files; no separate symbol package is published.
 5. The authorized release manager publishes the verified packages using the
    separately confirmed NuGet/GitHub Packages permissions. Verify fresh registry
    downloads and a clean consumer, then update downloads and send the approved
