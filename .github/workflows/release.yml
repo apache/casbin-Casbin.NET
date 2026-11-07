@@ -1,184 +1,94 @@
-name: Release
+name: Release candidate
 
-# Releases are driven by manually pushed git tags (no automatic versioning):
-#   v1.4.0-rc1  ->  GitHub pre-release only (the artifact used for the Apache vote)
-#   v1.4.0      ->  GitHub release + push packages to the package registries
+# Final publication is a separate release-manager action after the applicable
+# votes. Neither branch pushes nor final tags publish packages or moving aliases.
 on:
   push:
     tags:
-      - 'v*'
+      - 'v*-rc*'
 
-env:
-  SHA: ${{ GITHUB.SHA }}
-  REF: ${{ GITHUB.REF }}
-  RUN_ID: ${{ GITHUB.RUN_ID }}
-  RUN_NUMBER: ${{ GITHUB.RUN_NUMBER }}
-  GITHUB_TOKEN: ${{ SECRETS.GITHUB_TOKEN }}
+permissions:
+  contents: read
 
 jobs:
-  build:
-    runs-on: windows-latest
-
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-
-    - name: Setup .NET SDK
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: |
-          3.1.x
-          5.0.x
-          6.0.x
-          7.0.x
-          8.0.x
-          9.0.x
-        include-prerelease: true
-
-    - name: Check .NET info
-      run: dotnet --info
-
-    - name: Install dependencies
-      run: dotnet restore
-
-    - name: Build solution
-      run: dotnet build -c Release --no-restore
-
-    - name: Test solution
-      run: dotnet test -c Release --no-build --no-restore --verbosity normal --results-directory test-results
-
-    - name: Upload test results artefacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: "drop-ci-test-results"
-        path: './test-results'
-
-  github-release:
-    runs-on: ubuntu-latest
-    needs: build
+  verify:
     if: github.repository_owner == 'apache'
-
-    permissions:
-      contents: write
-
+    runs-on: windows-latest
     outputs:
       version: ${{ steps.version.outputs.version }}
-      prerelease: ${{ steps.version.outputs.prerelease }}
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Resolve version from tag
+      - name: Check tag against committed package version
         id: version
+        shell: pwsh
         run: |
-          TAG="${GITHUB_REF_NAME}"
-          VERSION="${TAG#v}"
-          if [[ "$VERSION" =~ ^(.+)-[Rr][Cc][0-9]+$ ]]; then
-            PRERELEASE=true
-            BASE_VERSION="${BASH_REMATCH[1]}"
-          else
-            PRERELEASE=false
-            BASE_VERSION="$VERSION"
-          fi
-          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "base_version=$BASE_VERSION" >> "$GITHUB_OUTPUT"
-          echo "prerelease=$PRERELEASE" >> "$GITHUB_OUTPUT"
-          echo "Tag: $TAG, version: $VERSION, base version: $BASE_VERSION, prerelease: $PRERELEASE"
-
-      # The source package must carry the name the final release will have, so the
-      # artifact voted on as a release candidate is bit-identical to the released one.
-      # The release manager downloads it, signs it locally and uses it for the vote.
-      - name: Create Apache source release package
-        id: source
-        run: |
-          BASE_VERSION="${{ steps.version.outputs.base_version }}"
-          NAME="apache-casbin-net-${BASE_VERSION}-incubating-src"
-          mkdir -p dist
-          git archive --format=tar.gz --prefix="${NAME}/" -o "dist/${NAME}.tar.gz" "${GITHUB_REF_NAME}"
-          (cd dist && sha512sum "${NAME}.tar.gz" > "${NAME}.tar.gz.sha512")
-          echo "name=$NAME" >> "$GITHUB_OUTPUT"
-          ls -l dist
-
-      - name: Upload source release artefacts
-        uses: actions/upload-artifact@v4
+          if ($env:GITHUB_REF_NAME -cnotmatch '^v(\d+\.\d+\.\d+)-rc[1-9]\d*$') {
+            throw 'Expected vMAJOR.MINOR.PATCH-rcN'
+          }
+          $version = $Matches[1]
+          [xml]$project = Get-Content Casbin/Casbin.csproj -Raw
+          $committedVersion = @($project.Project.PropertyGroup.Version | Where-Object { $_ })
+          if ($committedVersion.Count -ne 1 -or $committedVersion[0] -cne $version) {
+            throw 'The tag must match the committed Version in Casbin.csproj'
+          }
+          "version=$version" >> $env:GITHUB_OUTPUT
+      - name: Checkout pinned conformance cases
+        uses: actions/checkout@v4
         with:
-          name: "drop-ci-source-release"
-          path: './dist'
-
-      - name: Create GitHub release
+          repository: apache/casbin
+          ref: c92cc6a070e65dc621210c8d451de3092683cd1c
+          path: casbin-conformance
+          sparse-checkout: conformance
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            3.1.x
+            5.0.x
+            6.0.x
+            7.0.x
+            8.0.x
+            9.0.x
+      - run: dotnet restore
+      - run: dotnet build -c Release --no-restore
+      - name: Test with conformance cases enabled
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CASBIN_CONFORMANCE_DIR: ${{ github.workspace }}/casbin-conformance/conformance
+        run: dotnet test -c Release --no-build --no-restore --verbosity normal
+
+  source:
+    runs-on: ubuntu-latest
+    needs: verify
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Prepare source originals for release-manager review
+        env:
+          VERSION: ${{ needs.verify.outputs.version }}
         run: |
-          if [[ "${{ steps.version.outputs.prerelease }}" == "true" ]]; then
-            PRERELEASE_FLAG="--prerelease"
-          else
-            PRERELEASE_FLAG=""
-          fi
-          gh release create "${GITHUB_REF_NAME}" \
-            --title "${GITHUB_REF_NAME}" \
-            --generate-notes \
-            $PRERELEASE_FLAG \
-            "dist/${{ steps.source.outputs.name }}.tar.gz" \
-            "dist/${{ steps.source.outputs.name }}.tar.gz.sha512"
-
-  push-packages:
-      runs-on: windows-latest
-      needs: github-release
-      # Release candidates are only voted on, they are never published to the registries.
-      if: github.repository_owner == 'apache' && needs.github-release.outputs.prerelease == 'false'
-
-      steps:
-        - name: Checkout
-          uses: actions/checkout@v4
-          with:
-            fetch-depth: 0
-
-        - name: Setup .NET SDK
-          uses: actions/setup-dotnet@v4
-          with:
-            dotnet-version: |
-              3.1.x
-              5.0.x
-              6.0.x
-              7.0.x
-              8.0.x
-              9.0.x
-            include-prerelease: true
-
-        - name: Check .NET info
-          run: dotnet --info
-
-        - name: Install dependencies
-          run: dotnet restore
-
-        - name: Build solution
-          run: dotnet build -c Release --no-restore
-
-        - name: Pack packages
-          run: |
-            $Version = "${{ needs.github-release.outputs.version }}";
-            echo "Publishing version: $Version";
-            dotnet pack -c Release -o packages /p:PackageVersion=$Version /p:Version=$Version;
-
-        - name: Upload packages artefacts
-          uses: actions/upload-artifact@v4
-          with:
-            name: "drop-ci-packages"
-            path: './packages'
-
-        - name: Add github nuget source
-          run: dotnet nuget add source https://nuget.pkg.github.com/apache/index.json --name github.com --username apache --password $env:GITHUB_TOKEN
-
-        - name: Push packages to github.com
-          run: dotnet nuget push .\packages\*.nupkg -s github.com -k $env:GITHUB_TOKEN --skip-duplicate --timeout 600;
-
-        - name: Push packages to nuget.org
-          env:
-            NUGET_API_TOKEN: ${{ secrets.NUGET_API_KEY }}
-          run: dotnet nuget push .\packages\*.nupkg -s nuget.org -k $env:NUGET_API_TOKEN --skip-duplicate
+          set -euo pipefail
+          NAME="apache-casbin-net-${VERSION}-incubating-src"
+          mkdir dist
+          git archive --format=tar.gz --prefix="${NAME}/" -o "dist/${NAME}.tar.gz" HEAD
+          (cd dist && sha512sum "${NAME}.tar.gz" > "${NAME}.tar.gz.sha512")
+          cat DISCLAIMER > dist/release-notes.txt
+          printf '\nRelease candidate for review. This is not an approved Apache release.\n\nThe release manager must review and sign the source archive, stage it at the ASF and obtain the applicable release votes. Final publication must reuse the approved originals; see RELEASING.md.\n' >> dist/release-notes.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: source-candidate
+          path: dist/
+          if-no-files-found: error
+      - name: Create candidate without changing latest
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          # Creation fails if the release already exists. Never clobber artifacts.
+          gh release create "$TAG" --verify-tag --prerelease --latest=false \
+            --title "Apache Casbin.NET (Incubating) $TAG" \
+            --notes-file dist/release-notes.txt dist/*.tar.gz dist/*.sha512

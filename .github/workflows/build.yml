@@ -30,6 +30,7 @@ jobs:
       uses: actions/checkout@v4
       with:
         repository: apache/casbin
+        ref: c92cc6a070e65dc621210c8d451de3092683cd1c
         path: casbin-conformance
         sparse-checkout: conformance
 
