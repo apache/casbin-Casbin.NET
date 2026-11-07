@@ -10,7 +10,6 @@
   <PropertyGroup>
     <Version>2.21.4</Version>
     <PackageId>Casbin.NET</PackageId>
-    <PackageIcon>casbin.png</PackageIcon>
     <Description>Casbin.NET is a powerful and efficient open-source access control library for .NET (C#) projects. It provides support for enforcing authorization based on various access control models.
 
 Apache Casbin (Incubating) is an effort undergoing incubation at the Apache Software Foundation (ASF), sponsored by the Apache Incubator PMC.
@@ -26,8 +25,11 @@ While incubation status is not necessarily a reflection of the completeness or s
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/apache/casbin-Casbin.NET</RepositoryUrl>
     <PackageProjectUrl>https://github.com/apache/casbin-Casbin.NET</PackageProjectUrl>
-    <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <!-- Keep portable debug symbols and their source in the main package,
+         alongside its LICENSE, NOTICE and DISCLAIMER. -->
+    <IncludeSymbols>false</IncludeSymbols>
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+    <EmbedAllSources>true</EmbedAllSources>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PublishDocumentationFile>true</PublishDocumentationFile>
     <PublishReferencesDocumentationFiles>true</PublishReferencesDocumentationFiles>
@@ -142,7 +144,6 @@ While incubation status is not necessarily a reflection of the completeness or s
     <None Include="../LICENSE" Pack="true" PackagePath="" />
     <None Include="../NOTICE" Pack="true" PackagePath="" />
     <None Include="../DISCLAIMER" Pack="true" PackagePath="" />
-    <None Include="casbin.png" Pack="true" Visible="false" PackagePath="" />
   </ItemGroup>
   
 </Project>
