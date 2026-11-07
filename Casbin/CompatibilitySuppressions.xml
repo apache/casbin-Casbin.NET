@@ -1,0 +1,68 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  https://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+<!-- Existing NET452 conditionals deliberately use Task<IEnumerable<T>> rather
+     than IAsyncEnumerable<T>, and omit Microsoft.Extensions.Logging. Keep the
+     seven exact net452-to-net461 differences below visible without disabling
+     package validation or suppressing other members/frameworks/diagnostics.
+     https://learn.microsoft.com/dotnet/fundamentals/package-validation/diagnostic-ids -->
+<Suppressions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Casbin.Enforcer.BatchEnforceAsync``1(Casbin.EnforceContext,System.Collections.Generic.IEnumerable{``0})</Target>
+    <Left>lib/net452/Casbin.dll</Left>
+    <Right>lib/net461/Casbin.dll</Right>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Casbin.EnforcerExtension.BatchEnforceAsync``1(Casbin.IEnforcer,System.Collections.Generic.IEnumerable{``0})</Target>
+    <Left>lib/net452/Casbin.dll</Left>
+    <Right>lib/net461/Casbin.dll</Right>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Casbin.EnforcerExtension.BatchEnforceWithMatcherAsync``1(Casbin.IEnforcer,System.String,System.Collections.Generic.IEnumerable{``0})</Target>
+    <Left>lib/net452/Casbin.dll</Left>
+    <Right>lib/net461/Casbin.dll</Right>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Casbin.IEnforcer.BatchEnforceAsync``1(Casbin.EnforceContext,System.Collections.Generic.IEnumerable{``0})</Target>
+    <Left>lib/net452/Casbin.dll</Left>
+    <Right>lib/net461/Casbin.dll</Right>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Casbin.Persist.BaseAdapter.ReadPersistPolicyAsync</Target>
+    <Left>lib/net452/Casbin.dll</Left>
+    <Right>lib/net461/Casbin.dll</Right>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0006</DiagnosticId>
+    <Target>M:Casbin.IEnforcer.BatchEnforceAsync``1(Casbin.EnforceContext,System.Collections.Generic.IEnumerable{``0})</Target>
+    <Left>lib/net452/Casbin.dll</Left>
+    <Right>lib/net461/Casbin.dll</Right>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0006</DiagnosticId>
+    <Target>P:Casbin.IEnforcer.Logger</Target>
+    <Left>lib/net452/Casbin.dll</Left>
+    <Right>lib/net461/Casbin.dll</Right>
+  </Suppression>
+</Suppressions>
