@@ -30,6 +30,7 @@ jobs:
       uses: actions/checkout@v4
       with:
         repository: apache/casbin
+        ref: c92cc6a070e65dc621210c8d451de3092683cd1c
         path: casbin-conformance
         sparse-checkout: conformance
 
@@ -141,8 +142,7 @@ jobs:
 
         if($LastExitCode -ne 0)
         {
-            Write-Warning -Message "Pack packages warming, last exit code is ${LastExitCode}."
-            $LastExitCode = 0;
+            throw "Package validation failed with exit code ${LastExitCode}."
         }
 
     - name: Upload packages artefacts
