@@ -80,7 +80,7 @@ jobs:
         if($LastExitCode -ne 0)
         {
             Write-Warning -Message "Can not upload coverage, last exit code is ${LastExitCode}."
-            $LastExitCode = 0;
+
         }
 
     - name: Upload test results artefacts
@@ -143,7 +143,7 @@ jobs:
         if($LastExitCode -ne 0)
         {
             Write-Warning -Message "Pack packages warming, last exit code is ${LastExitCode}."
-            $LastExitCode = 0;
+
         }
 
     - name: Upload packages artefacts
