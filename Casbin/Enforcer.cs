@@ -153,7 +153,7 @@ namespace Casbin
                 return true;
             }
 
-            if (EnabledCache)
+            if (EnabledCache && context.Cacheable)
             {
                 if (EnforceCache.TryGetResult(requestValues, out bool cachedResult))
                 {
@@ -166,7 +166,7 @@ namespace Casbin
 
             bool result = InternalEnforce(in context, in requestValues);
 
-            if (EnabledCache)
+            if (EnabledCache && context.Cacheable)
             {
                 EnforceCache.TrySetResult(requestValues, result);
             }
@@ -197,7 +197,7 @@ namespace Casbin
                 return true;
             }
 
-            if (EnabledCache)
+            if (EnabledCache && context.Cacheable)
             {
                 bool? cachedResult = await EnforceCache.TryGetResultAsync(requestValues);
                 if (cachedResult.HasValue)
@@ -212,7 +212,7 @@ namespace Casbin
             context.HandleOptionAndCached = true;
             bool result = await InternalEnforceAsync(context, requestValues);
 
-            if (EnabledCache)
+            if (EnabledCache && context.Cacheable)
             {
                 await EnforceCache.TrySetResultAsync(requestValues, result);
             }

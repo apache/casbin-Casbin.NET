@@ -1179,6 +1179,74 @@ public class EnforcerTest
     }
 
     [Fact]
+    public void TestEnforceWithMatcherDoesNotReuseDefaultCache()
+    {
+        Enforcer e = new(TestModelFixture.GetBasicTestModel());
+
+        Assert.True(e.Enforce("alice", "data1", "read"));
+        Assert.False(e.EnforceWithMatcher("r.sub == p.sub && r.obj == p.obj && r.act == p.act && false",
+            "alice", "data1", "read"));
+    }
+
+    [Fact]
+    public void TestEnforceContextDoesNotReuseOtherContextCache()
+    {
+        IModel model = DefaultModel.Create();
+        model.AddDef("r", "r", "sub, obj, act");
+        model.AddDef("p", "p", "sub, obj, act");
+        model.AddDef("p", "p2", "sub, obj, act");
+        model.AddDef("e", "e", "some(where (p.eft == allow))");
+        model.AddDef("m", "m", "r.sub == p.sub && r.obj == p.obj && r.act == p.act");
+        model.AddDef("m", "m2", "r.sub == p2.sub && r.obj == p2.obj && r.act == p2.act");
+
+        Enforcer e = new(model);
+        e.AddPolicy("alice", "data1", "read");
+        e.AddNamedPolicy(PermConstants.PolicyType2, "alice", "data1", "write");
+
+        Assert.True(e.Enforce("alice", "data1", "read"));
+
+        EnforceContext context = e.CreateContext(PermConstants.DefaultRequestType,
+            PermConstants.PolicyType2, PermConstants.DefaultPolicyEffectType, PermConstants.MatcherType2);
+        Assert.True(e.Enforce(context, "alice", "data1", "write"));
+        Assert.False(e.Enforce(context, "alice", "data1", "read"));
+    }
+
+    [Fact]
+    public void TestEnforceSubjectPriorityInNonDefaultEffectType()
+    {
+        Enforcer e = new(TestModelFixture.GetNewTestModel(@"
+[request_definition]
+r = sub, obj, act
+r2 = sub, obj, act
+
+[policy_definition]
+p = sub, obj, act, eft
+p2 = sub, obj, act, eft
+
+[role_definition]
+g = _, _
+
+[policy_effect]
+e = some(where (p.eft == allow))
+e2 = subjectPriority(p.eft) || deny
+
+[matchers]
+m = r.sub == p.sub && r.obj == p.obj && r.act == p.act
+m2 = g(r2.sub, p2.sub) && r2.obj == p2.obj && r2.act == p2.act
+", @"
+p2, admin, data1, read, allow
+p2, alice, data1, read, deny
+g, alice, admin
+"));
+
+        e.BuildRoleLinks();
+
+        EnforceContext context = e.CreateContext("r2", "p2", "e2", "m2");
+        Assert.False(e.Enforce(context, "alice", "data1", "read"));
+        Assert.True(e.Enforce(context, "admin", "data1", "read"));
+    }
+
+    [Fact]
     public async Task TestEnforceWithMatcherAsync()
     {
         Enforcer e = new(TestModelFixture.GetBasicTestModel());

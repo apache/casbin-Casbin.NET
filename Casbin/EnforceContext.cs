@@ -5,9 +5,10 @@ namespace Casbin
 {
     public struct EnforceContext
     {
-        private EnforceContext(EnforceView view, bool explain = false)
+        private EnforceContext(EnforceView view, bool cacheable, bool explain = false)
         {
             View = view;
+            Cacheable = cacheable;
             HandleOptionAndCached = false;
 
             Explain = explain;
@@ -15,6 +16,7 @@ namespace Casbin
         }
 
         public EnforceView View { get; }
+        internal bool Cacheable { get; }
         public bool HandleOptionAndCached { get; internal set; }
 
         public bool Explain { get; }
@@ -42,13 +44,17 @@ namespace Casbin
         {
             IModel model = enforcer.Model;
             string name = string.Concat(requestType, policyType, effectType, matcherType);
+            bool cacheable = requestType == PermConstants.DefaultRequestType
+                && policyType == PermConstants.DefaultPolicyType
+                && effectType == PermConstants.DefaultPolicyEffectType
+                && matcherType == PermConstants.DefaultMatcherType;
             if (model.EnforceViewCache.TryGet(name, out EnforceView view))
             {
-                return new EnforceContext(view, explain);
+                return new EnforceContext(view, cacheable, explain);
             }
             view = EnforceView.Create(model, requestType, policyType, effectType, matcherType);
             _ = model.EnforceViewCache.TryAdd(name, view);
-            return new EnforceContext(view, explain);
+            return new EnforceContext(view, cacheable, explain);
         }
 
         public static EnforceContext CreateWithMatcher(IEnforcer enforcer, string matcher, bool explain)
@@ -71,7 +77,7 @@ namespace Casbin
             bool explain = false)
         {
             return new EnforceContext(EnforceView.CreateWithMatcher(enforcer.Model,
-                matcher, requestType, policyType, effectType), explain);
+                matcher, requestType, policyType, effectType), false, explain);
         }
     }
 }

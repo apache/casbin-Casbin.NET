@@ -12,27 +12,37 @@ namespace Casbin.Model
     {
         public static bool SortPolicy(this IModel model)
         {
-            if (model.Sections.TryGetAssertion(PermConstants.Section.PolicyEffectSection,
-                    PermConstants.DefaultPolicyEffectType, out PolicyEffectAssertion assertion) is false)
+            bool sorted = false;
+            Dictionary<string, int> map = null;
+            foreach (string policyType in model.Sections.GetPolicyAssertions().Keys.ToList())
             {
-                return false;
+                string effectType = PermConstants.DefaultPolicyEffectType +
+                                    policyType.Substring(PermConstants.DefaultPolicyType.Length);
+                if (model.Sections.TryGetAssertion(PermConstants.Section.PolicyEffectSection,
+                        effectType, out PolicyEffectAssertion assertion) is false
+                    && model.Sections.TryGetAssertion(PermConstants.Section.PolicyEffectSection,
+                        PermConstants.DefaultPolicyEffectType, out assertion) is false)
+                {
+                    continue;
+                }
+
+                switch (assertion.Value)
+                {
+                    case PermConstants.PolicyEffect.Priority:
+                    case PermConstants.PolicyEffect.PriorityDenyOverride:
+                        sorted |= model.PolicyStoreHolder.PolicyStore.SortPolicyByPriority(
+                            PermConstants.Section.PolicySection, policyType);
+                        break;
+                    case PermConstants.PolicyEffect.SubjectPriority:
+                        map ??= model.Sections.GetRoleAssertion(PermConstants.DefaultRoleType)
+                            .GetSubjectHierarchyMap();
+                        sorted |= model.PolicyStoreHolder.PolicyStore.SortPolicyBySubjectHierarchy(
+                            PermConstants.Section.PolicySection, policyType, map);
+                        break;
+                }
             }
 
-            switch (assertion.Value)
-            {
-                case PermConstants.PolicyEffect.Priority:
-                case PermConstants.PolicyEffect.PriorityDenyOverride:
-                    return model.PolicyStoreHolder.PolicyStore.SortPolicyByPriority(PermConstants.Section.PolicySection,
-                        PermConstants.DefaultPolicyType);
-                case PermConstants.PolicyEffect.SubjectPriority:
-                    Dictionary<string, int> map = model.Sections.GetRoleAssertion(PermConstants.DefaultRoleType)
-                        .GetSubjectHierarchyMap();
-                    return model.PolicyStoreHolder.PolicyStore.SortPolicyBySubjectHierarchy(
-                        PermConstants.Section.PolicySection,
-                        PermConstants.DefaultPolicyType, map);
-                default:
-                    return false;
-            }
+            return sorted;
         }
 
         public static bool LoadPolicy(this IModel model)
