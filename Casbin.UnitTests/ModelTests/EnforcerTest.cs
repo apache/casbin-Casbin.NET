@@ -1291,6 +1291,29 @@ g, alice, admin
     }
 
     [Fact]
+    public void TestEnforceWithCommentMarkersInMatcherStrings()
+    {
+        Enforcer e = new(DefaultModel.CreateFromText(@"
+[request_definition]
+r = sub, obj, act
+
+[policy_definition]
+p = sub, obj, act
+
+[policy_effect]
+e = some(where (p.eft == allow))
+
+[matchers]
+m = r.sub == p.sub && (r.act == ""#write"" || r.obj == 'a;b') # comment
+"));
+        e.AddPolicy("alice", "data1", "read");
+
+        Assert.True(e.Enforce("alice", "data1", "#write"));
+        Assert.True(e.Enforce("alice", "a;b", "read"));
+        Assert.False(e.Enforce("alice", "data1", "read"));
+    }
+
+    [Fact]
     public async Task TestEnforceWithMatcherAsync()
     {
         Enforcer e = new(TestModelFixture.GetBasicTestModel());

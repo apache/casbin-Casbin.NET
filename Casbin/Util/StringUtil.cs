@@ -35,12 +35,37 @@ namespace Casbin.Util
         /// <returns>The line without comments.</returns>
         internal static string RemoveComments(this string line)
         {
-            int pos = line.IndexOf("#", StringComparison.Ordinal);
+            int pos = IndexOfOutsideStringLiterals(line, PermConstants.PolicyCommentChar);
             if (pos is -1)
             {
                 return line;
             }
             return line.Substring(0, pos).Trim();
+        }
+
+        /// <summary>
+        /// Gets the index of the first of the given characters that is not inside a quoted string literal.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="chars"></param>
+        /// <returns>The index, or -1 when there is none.</returns>
+        internal static int IndexOfOutsideStringLiterals(string text, params char[] chars)
+        {
+            for (int i = 0; i < text.Length; i++)
+            {
+                char c = text[i];
+                if (c is '"' or '\'')
+                {
+                    i = GetStringLiteralEnd(text, i) - 1;
+                    continue;
+                }
+
+                if (Array.IndexOf(chars, c) is not -1)
+                {
+                    return i;
+                }
+            }
+            return -1;
         }
 
         /// <summary>

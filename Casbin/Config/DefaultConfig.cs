@@ -22,6 +22,7 @@ using System.IO;
 using System.IO.Pipes;
 using System.Linq;
 using System.Text;
+using Casbin.Util;
 #if !NET452
 using Microsoft.Extensions.Configuration;
 #endif
@@ -199,7 +200,8 @@ namespace Casbin.Config
             using var streamReader = new StreamReader(stream);
             while ((line = streamReader.ReadLine()) != null)
             {
-                line = line.Split(_defaultComment[0], ';').First().Trim();
+                int commentIndex = StringUtil.IndexOfOutsideStringLiterals(line, _defaultComment[0], ';');
+                line = (commentIndex is -1 ? line : line.Substring(0, commentIndex)).Trim();
                 if (line.EndsWith(_defaultFeed))
                 {
                     processedValue += line.Split(_defaultFeed[0]).First();
@@ -276,7 +278,7 @@ namespace Casbin.Config
                         }
                         option = optionVal[0].Trim();
                         string value = optionVal[1].Trim();
-                        int commentStartIdx = value.IndexOf(PermConstants.PolicyCommentChar);
+                        int commentStartIdx = StringUtil.IndexOfOutsideStringLiterals(value, PermConstants.PolicyCommentChar);
                         string lineProcessedValue = (commentStartIdx == -1 ? value : value.Remove(commentStartIdx)).Trim();
                         if (lineProcessedValue.EndsWith(_defaultFeed))
                         {
@@ -292,7 +294,7 @@ namespace Casbin.Config
                     else
                     {
                         string value = line.Trim();
-                        int commentStartIdx = value.IndexOf(PermConstants.PolicyCommentChar);
+                        int commentStartIdx = StringUtil.IndexOfOutsideStringLiterals(value, PermConstants.PolicyCommentChar);
                         string lineProcessedValue = (commentStartIdx == -1 ? value : value.Remove(commentStartIdx)).Trim();
                         if (lineProcessedValue.EndsWith(_defaultFeed))
                         {

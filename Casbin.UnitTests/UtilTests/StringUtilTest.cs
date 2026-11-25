@@ -28,7 +28,9 @@ public class StringUtilTest
         ["r.act == p.act", "r.act == p.act # comments"],
         ["r.act == p.act", "r.act == p.act#comments"],
         ["r.act == p.act", "r.act == p.act###"], ["", "### comments"],
-        ["r.act == p.act", "r.act == p.act"]
+        ["r.act == p.act", "r.act == p.act"],
+        ["r.act == \"#write\"", "r.act == \"#write\" # comments"],
+        ["r.obj == 'a#b' && r.act == \"c\\\"#d\"", "r.obj == 'a#b' && r.act == \"c\\\"#d\"#comments"]
     ];
 
     public static IEnumerable<object[]> ReplaceEvalTestData =
