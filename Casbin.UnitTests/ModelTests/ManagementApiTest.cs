@@ -530,6 +530,39 @@ public class ManagementApiTest
     }
 
     [Fact]
+    public void TestUpdatePoliciesReusingOldRules()
+    {
+        Enforcer e = new(TestModelFixture.GetNewRbacTestModel());
+        e.ClearPolicy();
+        e.AddPolicy("data_admin", "data1", "read");
+        e.AddPolicies([["alice", "data2", "read"], ["bob", "data2", "read"]]);
+        e.AddGroupingPolicies([["alice", "data_admin"], ["bob", "data_admin"]]);
+
+        Assert.True(e.UpdatePolicies(
+            [["alice", "data2", "read"], ["bob", "data2", "read"]],
+            [["bob", "data2", "read"], ["carol", "data2", "read"]]));
+        Assert.True(e.UpdateGroupingPolicies(
+            [["alice", "data_admin"], ["bob", "data_admin"]],
+            [["bob", "data_admin"], ["carol", "data_admin"]]));
+
+        e.TestGetPolicy([
+            ["data_admin", "data1", "read"],
+            ["bob", "data2", "read"],
+            ["carol", "data2", "read"]
+        ]);
+        TestGetFilteredGroupingPolicy(e, 1, [["bob", "data_admin"], ["carol", "data_admin"]], "data_admin");
+        Assert.False(e.Enforce("alice", "data1", "read"));
+        Assert.False(e.Enforce("alice", "data2", "read"));
+        Assert.True(e.Enforce("bob", "data1", "read"));
+        Assert.True(e.Enforce("carol", "data1", "read"));
+
+        Assert.True(e.RemovePolicy("bob", "data2", "read"));
+        Assert.True(e.RemoveGroupingPolicy("bob", "data_admin"));
+        Assert.False(e.Enforce("bob", "data1", "read"));
+        Assert.False(e.Enforce("bob", "data2", "read"));
+    }
+
+    [Fact]
     public async Task TestModifyGroupingPolicyAsync()
     {
         Enforcer e = new(TestModelFixture.GetNewRbacTestModel());

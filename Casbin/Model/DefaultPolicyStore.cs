@@ -266,12 +266,7 @@ namespace Casbin.Model
             }
 
             Node node = GetNode(section, policyType);
-            for (int i = 0; i < oldValuesList.Count; i++)
-            {
-                node.TryUpdatePolicy(oldValuesList[i], newValuesList[i]);
-            }
-
-            return true;
+            return node.TryUpdatePolicies(oldValuesList, newValuesList);
         }
 
         public bool RemovePolicy(string section, string policyType, IPolicyValues values)

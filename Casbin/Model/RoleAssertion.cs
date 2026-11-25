@@ -108,9 +108,15 @@ public class RoleAssertion : PolicyAssertion
                 $"the length of oldPolices should be equal to the length of newPolices, but got the length of oldPolices is {rulesList.Count}, the length of newPolices is {newRulesList.Count}.");
         }
 
-        for (int i = 0; i < rulesList.Count; i++)
+        // Remove all the old links before adding the new ones, since newRules may reuse rules of oldRules.
+        foreach (IEnumerable<string> rule in rulesList)
         {
-            BuildRoleLink(count, policyOperation, rulesList[i], newRulesList[i]);
+            BuildRoleLink(count, PolicyOperation.RemovePolicies, rule);
+        }
+
+        foreach (IEnumerable<string> rule in newRulesList)
+        {
+            BuildRoleLink(count, PolicyOperation.AddPolicies, rule);
         }
     }
 

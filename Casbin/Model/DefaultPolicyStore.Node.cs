@@ -143,6 +143,51 @@ public partial class DefaultPolicyStore
             return true;
         }
 
+        public bool TryUpdatePolicies(IReadOnlyList<IPolicyValues> oldValuesList,
+            IReadOnlyList<IPolicyValues> newValuesList)
+        {
+            if (newValuesList.Any(values => ValidatePolicy(values) is false))
+            {
+                return false;
+            }
+
+            Lock.EnterWriteLock();
+            try
+            {
+                // Resolve all indexes before writing, since newValuesList may reuse rules of oldValuesList.
+                int[] indexes = new int[oldValuesList.Count];
+                HashSet<int> resolvedIndexes = new();
+                for (int i = 0; i < oldValuesList.Count; i++)
+                {
+                    IPolicyValues oldValues = oldValuesList[i];
+                    int index = Policy.FindIndex(v => v.Equals(oldValues));
+                    if (index is -1 || resolvedIndexes.Add(index) is false)
+                    {
+                        return false;
+                    }
+
+                    indexes[i] = index;
+                }
+
+                foreach (IPolicyValues oldValues in oldValuesList)
+                {
+                    PolicyTextSet.Remove(oldValues.ToText());
+                }
+
+                for (int i = 0; i < newValuesList.Count; i++)
+                {
+                    Policy[indexes[i]] = newValuesList[i];
+                    PolicyTextSet.Add(newValuesList[i].ToText());
+                }
+            }
+            finally
+            {
+                Lock.ExitWriteLock();
+            }
+
+            return true;
+        }
+
         public bool TryRemovePolicy(IPolicyValues values)
         {
             if (ContainsPolicy(values) is false)
