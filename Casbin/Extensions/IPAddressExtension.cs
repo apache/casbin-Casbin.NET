@@ -40,21 +40,23 @@ namespace Casbin
 
             var ipBytes1 = matchIpAddress.GetAddressBytes().AsSpan();
             var ipBytes2 = ipAddress.GetAddressBytes().AsSpan();
-            byte nowCidrMaskCount = Convert.ToByte(matchCidr / 8);
+            int remainingMaskBits = matchCidr;
 
             for (int i = 0; i < bytesLength; i++)
             {
-                byte cidrByte = (byte)(nowCidrMaskCount == 0 ? 0x00 : 0xFF);
+                byte cidrByte = remainingMaskBits switch
+                {
+                    >= 8 => 0xFF,
+                    <= 0 => 0x00,
+                    _ => (byte)(0xFF << (8 - remainingMaskBits))
+                };
 
                 if ((ipBytes1[i] & cidrByte) != (ipBytes2[i] & cidrByte))
                 {
                     return false;
                 }
 
-                if (nowCidrMaskCount is not 0)
-                {
-                    nowCidrMaskCount--;
-                }
+                remainingMaskBits -= 8;
             }
 
             return true;

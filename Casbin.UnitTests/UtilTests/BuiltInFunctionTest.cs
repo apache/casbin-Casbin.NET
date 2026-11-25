@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
 using System.Collections.Generic;
 using Casbin.Functions;
 using Xunit;
@@ -33,7 +34,10 @@ public class BuiltInFunctionTest
         ["10.0.0.11", "10.0.0.0/8", true], ["11.0.0.123", "10.0.0.0/8", false],
         ["2001:db8::1", "2001:db8::1", true], ["2001:db8::1", "2001:db9::1", false],
         ["2001:db8::1", "2001:db8::1/128", true],
-        ["2001:db8::1", "2001:db9::/64", false]
+        ["2001:db8::1", "2001:db9::/64", false],
+        ["192.168.2.100", "192.168.2.0/25", true], ["192.168.2.200", "192.168.2.0/25", false],
+        ["10.1.2.3", "10.0.0.0/15", true], ["10.2.0.1", "10.0.0.0/15", false],
+        ["2001:db8:8000::1", "2001:db8::/33", false], ["2001:db8:7fff::1", "2001:db8::/33", true]
     ];
 
     public static IEnumerable<object[]> regexMatchTestData =
@@ -242,6 +246,14 @@ public class BuiltInFunctionTest
     public void TestIPMatch(string key1, string key2, bool expectedResult) =>
         Assert.Equal(expectedResult,
             BuiltInFunctions.IPMatch(key1, key2));
+
+    [Theory]
+    [InlineData("192.168.2.abc", "192.168.2.0/24")]
+    [InlineData("192.168.2.1", "192.168.2.abc")]
+    [InlineData("192.168.2.1", "192.168.2.0/33")]
+    [InlineData("2001:db8::1", "2001:db8::/129")]
+    public void TestIPMatchWithInvalidArguments(string key1, string key2) =>
+        Assert.Throws<ArgumentException>(() => BuiltInFunctions.IPMatch(key1, key2));
 
     [Theory]
     [MemberData(nameof(regexMatchTestData))]

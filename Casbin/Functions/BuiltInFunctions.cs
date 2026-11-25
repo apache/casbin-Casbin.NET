@@ -311,7 +311,8 @@ namespace Casbin.Functions
                 return false;
             }
 
-            if (byte.TryParse(ipSpan2.Slice(index + 1).ToString(), out byte cidrMask) is false)
+            if (byte.TryParse(ipSpan2.Slice(index + 1).ToString(), out byte cidrMask) is false
+                || cidrMask > ipAddress2.GetAddressBytes().Length * 8)
             {
                 throw new ArgumentException($"The argument {nameof(ip2)} has invalid CIDR mask.");
             }
