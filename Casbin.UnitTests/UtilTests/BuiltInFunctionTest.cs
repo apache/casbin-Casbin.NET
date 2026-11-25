@@ -78,7 +78,8 @@ public class BuiltInFunctionTest
         ["/proxy/myid/res/res2/res3", "/proxy/:id/res/*", "id", "myid"],
         ["/proxy/", "/proxy/:id/*", "id", ""], ["/alice", "/:id", "id", "alice"],
         ["/alice/all", "/:id/all", "id", "alice"], ["/alice", "/:id/all", "id", ""],
-        ["/alice/all", "/:id", "id", ""], ["/alice/all", "/:/all", "", ""]
+        ["/alice/all", "/:id", "id", ""], ["/alice/all", "/:/all", "", ""],
+        ["/a/1", "/(a|b)/:id", "id", "1"], ["/b/1/2", "/(a|b)/:id/:resId", "resId", "2"]
     ];
 
     public static IEnumerable<object[]> KeyGet3TestData =
@@ -107,7 +108,8 @@ public class BuiltInFunctionTest
         ],
         [
             "/api/group1_group_name/project1_admin/info", "/api/{g}_{gn}/{proj}_admin/info", "proj", "project1"
-        ]
+        ],
+        ["/a/1", "/(a|b)/{id}", "id", "1"], ["/b/1/2", "/(a|b)/{id}/{resId}", "resId", "2"]
     ];
 
     public static IEnumerable<object[]> keyMatchTestData =
@@ -167,7 +169,9 @@ public class BuiltInFunctionTest
         ["/parent/123/child/123/book/456", "/parent/{id}/child/{id}/book/{id}", false],
         ["/parent/123/child/456/book/123", "/parent/{id}/child/{id}/book/{id}", false],
         ["/parent/123/child/456/book/", "/parent/{id}/child/{id}/book/{id}", false],
-        ["/parent/123/child/456", "/parent/{id}/child/{id}/book/{id}", false]
+        ["/parent/123/child/456", "/parent/{id}/child/{id}/book/{id}", false],
+        ["/a/123/child/123", "/(a|b)/{id}/child/{id}", true],
+        ["/a/123/child/456", "/(a|b)/{id}/child/{id}", false]
     ];
 
     public static IEnumerable<object[]> KeyMatch5TestData =

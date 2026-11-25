@@ -70,11 +70,11 @@ namespace Casbin.Functions
         {
             var replacedKey2 = key2.Replace("/*", "/.*");
             var keys = s_keyGet2Regex.Matches(replacedKey2);
-            replacedKey2 = s_keyGet2Regex.Replace(replacedKey2, @"([^/]+)");
+            replacedKey2 = ReplaceTokens(replacedKey2, s_keyGet2Regex, "[^/]+");
             replacedKey2 = "^" + replacedKey2 + "$";
             var regex = new Regex(replacedKey2);
-            var values = regex.Matches(key1);
-            if (values.Count == 0)
+            var value = regex.Match(key1);
+            if (value.Success is false)
             {
                 return "";
             }
@@ -84,7 +84,7 @@ namespace Casbin.Functions
             {
                 if (keys[i].Value.AsSpan(1).SequenceEqual(pathVarSpan))
                 {
-                    return values[0].Groups[i + 1].Value;
+                    return value.Groups[TokenGroupName(i)].Value;
                 }
             }
 
@@ -104,11 +104,11 @@ namespace Casbin.Functions
         {
             var replacedKey2 = key2.Replace("/*", "/.*");
             var keys = s_keyGet3Regex.Matches(replacedKey2);
-            replacedKey2 = s_keyGet3Regex.Replace(replacedKey2, @"([^/]+?)");
+            replacedKey2 = ReplaceTokens(replacedKey2, s_keyGet3Regex, "[^/]+?");
             replacedKey2 = "^" + replacedKey2 + "$";
             var regex = new Regex(replacedKey2);
-            var values = regex.Matches(key1);
-            if (values.Count == 0)
+            var value = regex.Match(key1);
+            if (value.Success is false)
             {
                 return "";
             }
@@ -118,7 +118,7 @@ namespace Casbin.Functions
             {
                 if (keys[i].Value.AsSpan(1, keys[i].Value.Length - 2).SequenceEqual(pathVarSpan))
                 {
-                    return values[0].Groups[i + 1].Value;
+                    return value.Groups[TokenGroupName(i)].Value;
                 }
             }
 
@@ -201,8 +201,9 @@ namespace Casbin.Functions
 
             key2 = s_keyMatch4Regex.Replace(key2, match =>
             {
+                string group = TokenGroup(tokens.Count, "[^/]+");
                 tokens.Add(match.Value.Substring(1, match.Value.Length - 2));
-                return "([^/]+)";
+                return group;
             });
 
             var valueRegex = new Regex($"^{key2}$");
@@ -213,31 +214,38 @@ namespace Casbin.Functions
                 return false;
             }
 
-            int key1GroupMatchCount = key1Match.Groups.Count - 1;
-            if (key1GroupMatchCount != tokens.Count)
-            {
-                throw new ArgumentException("KeyMatch4: number of tokens is not equal to number of values");
-            }
-
-            var group = key1Match.Groups;
             var valueDictionary = new Dictionary<string, string>();
 
-            for (int i = 0; i < key1GroupMatchCount; i++)
+            for (int i = 0; i < tokens.Count; i++)
             {
                 string token = tokens[i];
+                string value = key1Match.Groups[TokenGroupName(i)].Value;
                 if (valueDictionary.ContainsKey(token) is false)
                 {
-                    valueDictionary.Add(token, group[i + 1].Value);
+                    valueDictionary.Add(token, value);
                     continue;
                 }
 
-                if (valueDictionary[token] != group[i + 1].Value)
+                if (valueDictionary[token] != value)
                 {
                     return false;
                 }
             }
 
             return true;
+        }
+
+        // The pattern variables are named groups, because key2 can have capture groups of its own,
+        // such as "/(a|b)/{id}".
+        private static string TokenGroup(int index, string expression) =>
+            $"(?<{TokenGroupName(index)}>{expression})";
+
+        private static string TokenGroupName(int index) => "casbinToken" + index;
+
+        private static string ReplaceTokens(string key2, Regex tokenRegex, string expression)
+        {
+            int index = 0;
+            return tokenRegex.Replace(key2, _ => TokenGroup(index++, expression));
         }
 
         /// <summary>
