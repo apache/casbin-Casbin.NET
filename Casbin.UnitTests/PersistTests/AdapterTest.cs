@@ -15,7 +15,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Casbin.Model;
 using Casbin.Persist;
@@ -278,5 +280,51 @@ public class AdapterTest
         Assert.False(await e.EnforceAsync("bob", "data1", "write"));
         Assert.False(await e.EnforceAsync("bob", "data2", "read"));
         Assert.True(await e.EnforceAsync("bob", "data2", "write"));
+    }
+
+    [Fact]
+    public void TestFileAdapterSavesFieldsWithCommasAndQuotes()
+    {
+        string path = Path.GetTempFileName();
+        try
+        {
+            File.WriteAllText(path, "p, alice, data1, read");
+            Enforcer e = new("Examples/basic_model.conf", new FileAdapter(path));
+            e.AddPolicy("bob", "data2, data3", "read");
+            e.AddPolicy("carol", "\"data4\"", "write");
+            e.SavePolicy();
+
+            Enforcer e2 = new("Examples/basic_model.conf", new FileAdapter(path));
+            Assert.True(e2.Enforce("alice", "data1", "read"));
+            Assert.True(e2.Enforce("bob", "data2, data3", "read"));
+            Assert.True(e2.Enforce("carol", "\"data4\"", "write"));
+            Assert.Equal(3, e2.GetPolicy().Count());
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [Fact]
+    public void TestFileAdapterRejectsFieldsWithLineBreaks()
+    {
+        string path = Path.GetTempFileName();
+        try
+        {
+            File.WriteAllText(path, "p, alice, data1, read");
+            Enforcer e = new("Examples/basic_model.conf", new FileAdapter(path));
+            e.AddPolicy("bob", "data2\np, eve, data1, read", "read");
+
+            Assert.Throws<ArgumentException>(() => e.SavePolicy());
+            Assert.Equal("p, alice, data1, read", File.ReadAllText(path));
+
+            Enforcer e2 = new("Examples/basic_model.conf", new FileAdapter(path));
+            Assert.False(e2.Enforce("eve", "data1", "read"));
+        }
+        finally
+        {
+            File.Delete(path);
+        }
     }
 }

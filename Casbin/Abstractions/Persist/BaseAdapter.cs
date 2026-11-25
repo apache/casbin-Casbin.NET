@@ -148,9 +148,29 @@ public abstract class BaseAdapter
         {
             string key = kv.Key;
             IEnumerable<IPolicyValues> value = kv.Value;
-            policy.AddRange(value.Select(p => $"{key}, {p.ToText()}"));
+            policy.AddRange(value.Select(p => PolicyLineToCsv(key, p)));
         }
         return policy;
+    }
+
+    private static string PolicyLineToCsv(string policyType, IPolicyValues values) =>
+        string.Join(PermConstants.PolicySeparatorString, new[] { policyType }.Concat(values).Select(ToCsvField));
+
+    // Fields with a comma or a quote are quoted so that they are loaded back as they are,
+    // and line breaks are rejected because each policy is loaded from its own line.
+    private static string ToCsvField(string field)
+    {
+        if (field.IndexOfAny(new[] { '\r', '\n' }) is not -1)
+        {
+            throw new ArgumentException($"Invalid policy field \"{field}\": line breaks are not allowed.");
+        }
+
+        if (field.IndexOfAny(new[] { PermConstants.PolicySeparatorChar, '"' }) is -1)
+        {
+            return field;
+        }
+
+        return "\"" + field.Replace("\"", "\"\"") + "\"";
     }
 
     private static IEnumerable<string> ConvertToPolicyStrings(IPolicyStore store)
