@@ -390,6 +390,10 @@ namespace Casbin
 
         public static void ClearCache(this IEnforcer enforcer)
         {
+            if (enforcer is Enforcer concreteEnforcer)
+            {
+                concreteEnforcer.IncrementCacheVersion();
+            }
             enforcer.EnforceCache?.Clear();
 #if !NET452
             enforcer.Logger?.LogInformation("Enforcer Cache, Cleared all enforce cache");

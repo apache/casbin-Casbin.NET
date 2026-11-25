@@ -16,6 +16,7 @@
 // under the License.
 
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Casbin.Caching;
 using Casbin.Effect;
@@ -76,6 +77,8 @@ namespace Casbin
 
             model.SortPolicy();
         }
+
+        private long _cacheVersion;
 
         #region Options
 
@@ -170,6 +173,7 @@ namespace Casbin
                 return true;
             }
 
+            long cacheVersion = Interlocked.Read(ref _cacheVersion);
             if (EnabledCache && context.Cacheable)
             {
                 if (EnforceCache.TryGetResult(requestValues, out bool cachedResult))
@@ -186,6 +190,7 @@ namespace Casbin
             if (EnabledCache && context.Cacheable)
             {
                 EnforceCache.TrySetResult(requestValues, result);
+                DropCacheIfChanged(cacheVersion);
             }
 #if !NET452
             this.LogEnforceResult(context, requestValues, result);
@@ -214,6 +219,7 @@ namespace Casbin
                 return true;
             }
 
+            long cacheVersion = Interlocked.Read(ref _cacheVersion);
             if (EnabledCache && context.Cacheable)
             {
                 bool? cachedResult = await EnforceCache.TryGetResultAsync(requestValues);
@@ -232,11 +238,24 @@ namespace Casbin
             if (EnabledCache && context.Cacheable)
             {
                 await EnforceCache.TrySetResultAsync(requestValues, result);
+                DropCacheIfChanged(cacheVersion);
             }
 #if !NET452
             this.LogEnforceResult(context, requestValues, result);
 #endif
             return result;
+        }
+
+        internal void IncrementCacheVersion() => Interlocked.Increment(ref _cacheVersion);
+
+        // The policy may have changed and the cache been cleared while the result was being computed,
+        // so a result set after that is dropped.
+        private void DropCacheIfChanged(long cacheVersion)
+        {
+            if (Interlocked.Read(ref _cacheVersion) != cacheVersion)
+            {
+                EnforceCache.Clear();
+            }
         }
 
         public IEnumerable<bool> BatchEnforce<TRequest>(EnforceContext context,

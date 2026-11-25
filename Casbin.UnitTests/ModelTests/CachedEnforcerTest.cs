@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
 using Casbin.UnitTests.Fixtures;
 using Casbin.UnitTests.Mock;
 using Xunit;
@@ -98,6 +99,41 @@ public class CachedEnforcerTest
         Assert.False(e.Enforce("alice", "data1", "write"));
         Assert.False(e.Enforce("alice", "data2", "read"));
         Assert.False(e.Enforce("alice", "data2", "write"));
+    }
+
+    [Fact]
+    public void TestCacheDropsResultWhenPolicyChangesDuringEnforce()
+    {
+        Enforcer e = new(TestModelFixture.GetNewTestModel(@"
+[request_definition]
+r = sub, obj, act
+
+[policy_definition]
+p = sub, obj, act
+
+[role_definition]
+g = _, _
+
+[policy_effect]
+e = some(where (p.eft == allow))
+
+[matchers]
+m = g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act && removeRole()
+", TestModelFixture.RbacPolicyText));
+        e.BuildRoleLinks();
+        bool removeRole = true;
+        e.AddFunction("removeRole", new Func<bool>(() =>
+        {
+            if (removeRole)
+            {
+                removeRole = false;
+                e.RemoveGroupingPolicy("alice", "data2_admin");
+            }
+            return true;
+        }));
+
+        Assert.True(e.Enforce("alice", "data2", "read"));
+        Assert.False(e.Enforce("alice", "data2", "read"));
     }
 
     [Fact]
