@@ -44,6 +44,75 @@ namespace Casbin.Util
         }
 
         /// <summary>
+        /// Replaces the matches of regex that are not inside a quoted string literal.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="regex"></param>
+        /// <param name="replacement"></param>
+        /// <returns></returns>
+        internal static string ReplaceOutsideStringLiterals(string text, Regex regex, string replacement)
+        {
+            List<KeyValuePair<int, int>> literals = GetStringLiteralRanges(text);
+            if (literals.Count is 0)
+            {
+                return regex.Replace(text, replacement);
+            }
+
+            return regex.Replace(text, match =>
+                literals.Any(literal => match.Index >= literal.Key && match.Index < literal.Value)
+                    ? match.Value
+                    : replacement);
+        }
+
+        /// <summary>
+        /// Gets the start and the end (exclusive) of each quoted string literal in the text.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        internal static List<KeyValuePair<int, int>> GetStringLiteralRanges(string text)
+        {
+            List<KeyValuePair<int, int>> ranges = new();
+            for (int i = 0; i < text.Length; i++)
+            {
+                if (text[i] is not '"' and not '\'')
+                {
+                    continue;
+                }
+
+                int end = GetStringLiteralEnd(text, i);
+                ranges.Add(new KeyValuePair<int, int>(i, end));
+                i = end - 1;
+            }
+            return ranges;
+        }
+
+        /// <summary>
+        /// Gets the index just past the string literal that starts at the given index,
+        /// or the length of the text when the literal is not closed.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="start"></param>
+        /// <returns></returns>
+        internal static int GetStringLiteralEnd(string text, int start)
+        {
+            char quote = text[start];
+            for (int i = start + 1; i < text.Length; i++)
+            {
+                if (text[i] is '\\')
+                {
+                    i++;
+                    continue;
+                }
+
+                if (text[i] == quote)
+                {
+                    return i + 1;
+                }
+            }
+            return text.Length;
+        }
+
+        /// <summary>
         /// Determines whether matcher contains eval function
         /// </summary>
         /// <param name="expressString"></param>

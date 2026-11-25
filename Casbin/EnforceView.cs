@@ -144,12 +144,12 @@ namespace Casbin
                 foreach (KeyValuePair<string, int> tokenPair in view.RequestAssertion.Tokens)
                 {
                     Regex reg = new Regex(perfix + $@"{view.RequestType}\.{tokenPair.Key}" + suffix);
-                    matcher = reg.Replace(matcher, $"{view.RequestType}[{tokenPair.Value}]");
+                    matcher = StringUtil.ReplaceOutsideStringLiterals(matcher, reg, $"{view.RequestType}[{tokenPair.Value}]");
                 }
                 foreach (KeyValuePair<string, int> tokenPair in view.PolicyAssertion.Tokens)
                 {
                     Regex reg = new Regex(perfix + $@"{view.PolicyType}\.{tokenPair.Key}" + suffix);
-                    matcher = reg.Replace(matcher, $"{view.PolicyType}[{tokenPair.Value}]");
+                    matcher = StringUtil.ReplaceOutsideStringLiterals(matcher, reg, $"{view.PolicyType}[{tokenPair.Value}]");
                 }
                 return matcher;
             }
@@ -157,12 +157,12 @@ namespace Casbin
             foreach (KeyValuePair<string, int> tokenPair in view.RequestAssertion.Tokens)
             {
                 Regex reg = new Regex(perfix + $@"{view.RequestType}\.{tokenPair.Key}" + suffix);
-                matcher = reg.Replace(matcher, $"{view.RequestType}.Value{tokenPair.Value + 1}");
+                matcher = StringUtil.ReplaceOutsideStringLiterals(matcher, reg, $"{view.RequestType}.Value{tokenPair.Value + 1}");
             }
             foreach (KeyValuePair<string, int> tokenPair in view.PolicyAssertion.Tokens)
             {
                 Regex reg = new Regex(perfix + $@"{view.PolicyType}\.{tokenPair.Key}" + suffix);
-                matcher = reg.Replace(matcher, $"{view.PolicyType}.Value{tokenPair.Value + 1}");
+                matcher = StringUtil.ReplaceOutsideStringLiterals(matcher, reg, $"{view.PolicyType}.Value{tokenPair.Value + 1}");
             }
             return matcher;
         }

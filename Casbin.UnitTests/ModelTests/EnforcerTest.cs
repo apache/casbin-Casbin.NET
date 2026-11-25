@@ -1277,6 +1277,20 @@ g, alice, admin
     }
 
     [Fact]
+    public void TestEnforceWithTokenNamesInStringLiterals()
+    {
+        Enforcer e = new(TestModelFixture.GetBasicTestModel());
+
+        string matcher = "r.sub == p.sub && r.obj == p.obj && r.act == p.act || r.obj == \"/r.sub/p.obj\"";
+        Assert.True(e.EnforceWithMatcher(matcher, "bob", "/r.sub/p.obj", "read"));
+        Assert.False(e.EnforceWithMatcher(matcher, "bob", "/bob/data1", "read"));
+
+        matcher = "r.sub == p.sub && r.obj == p.obj && r.act == p.act || r.obj == 'https://p.sub r.act'";
+        Assert.True(e.EnforceWithMatcher(matcher, "bob", "https://p.sub r.act", "read"));
+        Assert.True(e.EnforceWithMatcher(matcher, "alice", "data1", "read"));
+    }
+
+    [Fact]
     public async Task TestEnforceWithMatcherAsync()
     {
         Enforcer e = new(TestModelFixture.GetBasicTestModel());
