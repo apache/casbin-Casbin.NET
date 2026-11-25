@@ -16,17 +16,30 @@
 // under the License.
 
 using System.Collections.Concurrent;
+using System.Threading;
 using Casbin.Model;
 
 namespace Casbin.Caching;
 
 public class GFunctionCache : IGFunctionCache
 {
+    private const int MaxEntries = 100000;
     private readonly ConcurrentDictionary<string, bool> _cache = new();
+    private int _count;
 
     public void Set(string name1, string name2, bool result, string domain = null)
     {
-        _cache[Key(name1, name2, domain)] = result;
+        string key = Key(name1, name2, domain);
+        if (_cache.TryAdd(key, result) is false)
+        {
+            _cache[key] = result;
+            return;
+        }
+
+        if (Interlocked.Increment(ref _count) > MaxEntries)
+        {
+            Clear();
+        }
     }
 
     public bool TryGet(string name1, string name2, out bool result, string domain = null)
@@ -37,6 +50,7 @@ public class GFunctionCache : IGFunctionCache
     public void Clear()
     {
         _cache.Clear();
+        Interlocked.Exchange(ref _count, 0);
     }
 
     private static string Key(string name1, string name2, string domain = null)

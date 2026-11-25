@@ -22,5 +22,11 @@ namespace Casbin.Caching
     public class EnforceCacheOptions
     {
         public TimeSpan WaitTimeOut { get; set; } = TimeSpan.FromMilliseconds(50);
+
+        /// <summary>
+        /// The maximum number of results to keep, the cache is emptied when a new result would exceed it.
+        /// Zero or less means no limit.
+        /// </summary>
+        public int MaxEntries { get; set; } = 100000;
     }
 }

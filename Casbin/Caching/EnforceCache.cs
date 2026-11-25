@@ -95,6 +95,12 @@ namespace Casbin.Caching
 
             try
             {
+                if (CacheOptions.MaxEntries > 0 && _memoryCache.Count >= CacheOptions.MaxEntries
+                                               && _memoryCache.ContainsKey(key) is false)
+                {
+                    _memoryCache = new Dictionary<string, bool>();
+                }
+
                 _memoryCache[key] = result;
                 return true;
             }

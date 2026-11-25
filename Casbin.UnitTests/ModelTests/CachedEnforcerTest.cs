@@ -16,6 +16,8 @@
 // under the License.
 
 using System;
+using Casbin.Caching;
+using Casbin.Model;
 using Casbin.UnitTests.Fixtures;
 using Casbin.UnitTests.Mock;
 using Xunit;
@@ -134,6 +136,28 @@ m = g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act && removeRole()
 
         Assert.True(e.Enforce("alice", "data2", "read"));
         Assert.False(e.Enforce("alice", "data2", "read"));
+    }
+
+    [Fact]
+    public void TestCacheIsBounded()
+    {
+        EnforceCache cache = new(new EnforceCacheOptions { MaxEntries = 2 });
+        Enforcer e = new(TestModelFixture.GetBasicTestModel());
+        e.SetEnforceCache(cache);
+
+        Assert.True(e.Enforce("alice", "data1", "read"));
+        Assert.False(e.Enforce("alice", "data1", "write"));
+        Assert.True(cache.TryGetResult(Request.CreateValues("alice", "data1", "read"), out _));
+        Assert.True(cache.TryGetResult(Request.CreateValues("alice", "data1", "write"), out _));
+
+        Assert.True(e.Enforce("alice", "data1", "read"));
+        Assert.True(cache.TryGetResult(Request.CreateValues("alice", "data1", "write"), out _));
+
+        Assert.False(e.Enforce("alice", "data2", "read"));
+        Assert.False(cache.TryGetResult(Request.CreateValues("alice", "data1", "read"), out _));
+        Assert.False(cache.TryGetResult(Request.CreateValues("alice", "data1", "write"), out _));
+        Assert.True(cache.TryGetResult(Request.CreateValues("alice", "data2", "read"), out bool result));
+        Assert.False(result);
     }
 
     [Fact]
