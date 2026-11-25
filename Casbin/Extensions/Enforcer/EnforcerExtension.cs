@@ -381,6 +381,10 @@ namespace Casbin
         public static void ClearPolicy(this IEnforcer enforcer)
         {
             enforcer.Model.PolicyStoreHolder.PolicyStore.ClearPolicy();
+            if (enforcer.AutoBuildRoleLinks)
+            {
+                enforcer.BuildRoleLinks();
+            }
             enforcer.ClearCache();
         }
 

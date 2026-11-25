@@ -814,6 +814,19 @@ public class EnforcerTest
         e.ClearPolicy();
     }
 
+    [Fact]
+    public void TestClearPolicyClearsRoleLinks()
+    {
+        Enforcer e = new("Examples/rbac_model.conf", "Examples/rbac_policy.csv");
+        Assert.True(e.Enforce("alice", "data2", "read"));
+
+        e.ClearPolicy();
+        e.AddPolicy("data2_admin", "data2", "read");
+
+        Assert.False(e.Enforce("alice", "data2", "read"));
+        Assert.Empty(e.GetRolesForUser("alice"));
+    }
+
     #endregion
 
     #region Extension features
