@@ -16,6 +16,7 @@
 // under the License.
 
 using System.Collections.Concurrent;
+using Casbin.Model;
 
 namespace Casbin.Caching;
 
@@ -40,9 +41,8 @@ public class GFunctionCache : IGFunctionCache
 
     private static string Key(string name1, string name2, string domain = null)
     {
-        bool hasDomain = domain is not null;
-        return hasDomain
-            ? string.Join(":", name1, name2, domain)
-            : string.Join(":", name1, name2);
+        return domain is not null
+            ? Request.GetCacheKey(name1, name2, domain)
+            : Request.GetCacheKey(name1, name2);
     }
 }

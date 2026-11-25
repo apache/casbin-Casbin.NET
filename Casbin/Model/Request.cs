@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Text;
+
 namespace Casbin.Model;
 
 public static class Request
@@ -147,7 +149,7 @@ public static class Request
                     return false;
                 }
 
-                key = value.Value1;
+                key = GetCacheKey(value.Value1);
                 return true;
             case 2:
                 if (requestValues is not RequestValues<string, string> values2)
@@ -156,7 +158,7 @@ public static class Request
                     return false;
                 }
 
-                key = string.Concat(values2.Value1, "$$", values2.Value2);
+                key = GetCacheKey(values2.Value1, values2.Value2);
                 return true;
             case 3:
                 if (requestValues is not RequestValues<string, string, string> values3)
@@ -165,7 +167,7 @@ public static class Request
                     return false;
                 }
 
-                key = string.Concat(values3.Value1, "$$", values3.Value2, "$$", values3.Value3);
+                key = GetCacheKey(values3.Value1, values3.Value2, values3.Value3);
                 return true;
             case 4:
                 if (requestValues is not RequestValues<string, string, string, string> values4)
@@ -174,11 +176,29 @@ public static class Request
                     return false;
                 }
 
-                key = string.Concat(values4.Value1, "$$", values4.Value2, "$$", values4.Value3, "$$", values4.Value4);
+                key = GetCacheKey(values4.Value1, values4.Value2, values4.Value3, values4.Value4);
                 return true;
         }
 
         key = null;
         return false;
+    }
+
+    // Each value is prefixed with its length, so that values containing the separator
+    // can not make two different requests share a key.
+    internal static string GetCacheKey(params string[] values)
+    {
+        StringBuilder builder = new();
+        foreach (string value in values)
+        {
+            if (value is null)
+            {
+                builder.Append("-1:");
+                continue;
+            }
+
+            builder.Append(value.Length).Append(':').Append(value);
+        }
+        return builder.ToString();
     }
 }

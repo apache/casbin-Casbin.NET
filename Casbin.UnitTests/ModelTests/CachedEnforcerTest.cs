@@ -99,4 +99,27 @@ public class CachedEnforcerTest
         Assert.False(e.Enforce("alice", "data2", "read"));
         Assert.False(e.Enforce("alice", "data2", "write"));
     }
+
+    [Fact]
+    public void TestCacheKeysDoNotCollide()
+    {
+        Enforcer e = new(TestModelFixture.GetBasicTestModel());
+        e.AddPolicy("alice$$data", "x", "read");
+
+        Assert.True(e.Enforce("alice$$data", "x", "read"));
+        Assert.False(e.Enforce("alice", "data$$x", "read"));
+        Assert.False(e.Enforce("alice$$data$$x", "", "read"));
+    }
+
+    [Fact]
+    public void TestGFunctionCacheKeysDoNotCollide()
+    {
+        Enforcer e = new(TestModelFixture.GetNewRbacTestModel());
+        e.EnableCache(false);
+        e.AddPolicy("x:data2_admin", "data3", "read");
+        e.AddGroupingPolicy("bob:x", "data2_admin");
+
+        Assert.True(e.Enforce("bob:x", "data2", "read"));
+        Assert.False(e.Enforce("bob", "data3", "read"));
+    }
 }
