@@ -65,7 +65,6 @@ While incubation status is not necessarily a reflection of the completeness or s
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="casbin.snk" />
     <None Remove="Casbin.csproj.DotSettings" />
   </ItemGroup>
 
